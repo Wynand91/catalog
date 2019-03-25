@@ -1,0 +1,57 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Guitar World</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Guitar World</a>
+        <div class="login-logout">
+            <div class="collapse navbar-collapse" id="login">
+                <button>Login</button>
+            </div>
+            <div class="collapse navbar-collapse" id="logout">
+                <button>Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <h1>Guitar World</h1>
+
+        <div class="dropdown">
+          <button class="dropbtn">Sort by Category</button>
+          <div class="dropdown-content">
+              <a href="#">Acoustic</a>
+              <a href="#">Classic</a>
+              <a href="#">Telecaster</a>
+              <a href="#">Stratocaster</a>
+              <a href="#">Les paul</a>
+              <a href="#">Flying V</a>
+              <a href="#">Hollow body</a>
+              <a href="#">Bass guitars</a>
+          </div>
+        </div>
+
+        <div class="item-list">
+            {% for i in items %}
+            <div>
+                <a href="#">
+                    <p class="item-name">{{i.item_name}}</p>
+                    <p class="item-category">{{i.category.label}}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
