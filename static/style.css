@@ -48,6 +48,11 @@
     margin-top: 40px;
 }
 
+.add-item-button {
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
 .item-list {
     margin-top: 50px;
     padding-left: 50px;

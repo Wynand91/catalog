@@ -1,17 +1,15 @@
 import sys
-from enum import Enum
-from babel import lazy_gettext as _
-from sqlalchemy import Column, ForeignKey, Integer, String
+import enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from passlib.apps import custom_app_context as pwd_context
-from sqlalchemy_utils import ChoiceType
 
 Base = declarative_base()
 
 
-class ItemCategory(Enum):
+class ItemCategory(enum.Enum):
     acoustic = 1
     classic = 2
     telecaster = 3
@@ -20,16 +18,6 @@ class ItemCategory(Enum):
     flying = 6
     hollowbody = 7
     bass = 8
-
-
-ItemCategory.acoustic.label = _(u'Acoustic')
-ItemCategory.classic.label = _(u'Classic')
-ItemCategory.telecaster.label = _(u'Telecaster')
-ItemCategory.stratocaster.label = _(u'Stratocaster')
-ItemCategory.lespaul.label = _(u'Les paul')
-ItemCategory.flying.label = _(u'Flying')
-ItemCategory.hollowbody.label = _(u'Hollow body')
-ItemCategory.bass.label = _(u'Bass')
 
 
 class User(Base):
@@ -51,9 +39,9 @@ class Item(Base):
     id = Column(Integer, primary_key=True)
     item_name = Column(String(50))
     description = Column(String(250))
-    category = Column(ChoiceType(ItemCategory, impl=Integer()))
+    category = Column(Enum(ItemCategory))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
-engine = create_engine('sqlite:///catalog.db')
-Base.metadata.create_all(engine)
+# engine = create_engine('sqlite:///catalog.db')
+# Base.metadata.create_all(engine)

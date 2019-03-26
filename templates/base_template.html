@@ -1,0 +1,46 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Guitar World</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Guitar World</a>
+        <div class="login-logout">
+                <div class="collapse navbar-collapse" id="logout">
+                    <button>Logout</button>
+                </div>
+                <div class="collapse navbar-collapse" id="login">
+                    <button>Login</button>
+                </div>
+
+        </div>
+    </nav>
+
+    <div class="dropdown">
+        <button class="dropbtn">Sort by Category</button>
+        <div class="dropdown-content">
+            <a href="{{ url_for('category_view', category_name='acoustic') }}">Acoustic</a>
+            <a href="{{ url_for('category_view', category_name='classic') }}">Classic</a>
+            <a href="{{ url_for('category_view', category_name='telecaster') }}">Telecaster</a>
+            <a href="{{ url_for('category_view', category_name='stratocaster') }}">Stratocaster</a>
+            <a href="{{ url_for('category_view', category_name='lespaul') }}">Les paul</a>
+            <a href="{{ url_for('category_view', category_name='flying') }}">Flying V</a>
+            <a href="{{ url_for('category_view', category_name='hollowbody') }}">Hollow body</a>
+            <a href="{{ url_for('category_view', category_name='bass') }}">Bass guitars</a>
+        </div>
+    </div>
+
+
+
+    {% block body %}{% endblock %}
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

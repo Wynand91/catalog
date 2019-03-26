@@ -7,12 +7,12 @@
         <h1>Guitar World</h1>
         <button class="add-item-button"><a href="#">Add Item</a></button>
 
+
         <div class="item-list">
             {% for i in items %}
             <div>
                 <a href="#">
-                    <p class="item-name">{{i.item_name}} ({{i.category.name}})</p>
-                    <p>{{i.category}}</p>
+                    <p class="item-name">{{i.item_name}}</p>
                 </a>
             </div>
             {% endfor %}
@@ -20,4 +20,3 @@
     </div>
 
 {% endblock %}
-
