@@ -4,6 +4,21 @@
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <title>Guitar World</title>
+
+    <!--Load prerequisites for google signin-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js?onload=start"> </script>
+    <script>
+        gapi.load('auth2', function() {
+          auth2 = gapi.auth2.init({
+            client_id: '950296359546-tr6a0qci8smluvackvmj51bruuu73qos.apps.googleusercontent.com',
+            // Scopes to request in addition to 'profile' and 'email'
+            //scope: 'additional_scope'
+          });
+        });
+    </script>
+
+
 </head>
 <body>
 
@@ -11,30 +26,14 @@
         <a class="navbar-brand" href="{{ url_for('homepage') }}">Guitar World</a>
         <div class="login-logout">
                 <div class="collapse navbar-collapse" id="logout">
-                    <button>Logout</button>
+                    <button  class="g-signin2" id="signinButton">Sign in with Google</button>
                 </div>
                 <div class="collapse navbar-collapse" id="login">
-                    <button>Login</button>
+                    <button>Logout</button>
                 </div>
 
         </div>
     </nav>
-
-    <div class="dropdown">
-        <button class="dropbtn">Sort by Category</button>
-        <div class="dropdown-content">
-            <a href="{{ url_for('category_view', category_name='acoustic') }}">Acoustic</a>
-            <a href="{{ url_for('category_view', category_name='classic') }}">Classic</a>
-            <a href="{{ url_for('category_view', category_name='telecaster') }}">Telecaster</a>
-            <a href="{{ url_for('category_view', category_name='stratocaster') }}">Stratocaster</a>
-            <a href="{{ url_for('category_view', category_name='lespaul') }}">Les paul</a>
-            <a href="{{ url_for('category_view', category_name='flying') }}">Flying V</a>
-            <a href="{{ url_for('category_view', category_name='hollowbody') }}">Hollow body</a>
-            <a href="{{ url_for('category_view', category_name='bass') }}">Bass guitars</a>
-        </div>
-    </div>
-
-
 
     {% block body %}{% endblock %}
 
@@ -42,5 +41,39 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+  $('#signinButton').click(function() {
+    auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(signInCallback);
+  });
+</script>
+<script>
+function signInCallback(json) {
+  // authResult = JSON.parse(json);
+  authResult = json;
+  if (authResult['code']) {
+    // Hide the sign-in button now that the user is authorized, for example:
+    $('#signinButton').attr('style', 'display: none');
+      $('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
+    // Send the code to the server
+    /*$.ajax({
+      type: 'POST',
+      url: '/oauth/google',
+      processData: false,
+      data: authResult['code'],
+      contentType: 'application/octet-stream; charset=utf-8',
+      success: function(result) {
+        // Handle or verify the server response if necessary.
+        if (result) {
+          $('#result').html('Login Successful!</br>'+ result + '')
+        } else if (authResult['error']) {
+          console.log('There was an error: ' + authResult['error']);
+        } else {
+          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+        }
+      }
+    }); */
+  }
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,35 @@
+{% extends "base_template.html" %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="add-item">
+            <h1>Edit item:</h1>
+            <form method="POST" action=".">
+                <div class="form-field">
+                    <label>Item Name:</label>
+                    <input type="text" name="name" value="{{item.item_name}}">
+                </div>
+                <div class="form-field">
+                    <label>Description:</label>
+                    <input type="text" name="description" value="{{item.description}}">
+                </div>
+                <div class="form-field">
+                    <label>Category:</label>
+                    <select name="category">
+                        <option value="acoustic">Acoustic</option>
+                        <option value="classic">Classic</option>
+                        <option value="telecaster">Telecaster</option>
+                        <option value="stratocaster">Stratocaster</option>
+                        <option value="lespaul">Les paul</option>
+                        <option value="flying">Flying</option>
+                        <option value="hollowbody">Hollow body</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <input type="submit" value="Change">
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

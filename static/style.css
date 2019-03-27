@@ -45,7 +45,6 @@
 .dropdown {
     float: right;
     margin-right: 50px;
-    margin-top: 40px;
 }
 
 .add-item-button {
@@ -62,4 +61,27 @@
 
 .item-name {
     font-size: 25px;
+}
+
+.description-container {
+    width: 800px;
+    border: 1px solid black;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.description-container h1 {
+    padding-top: 50px;
+}
+
+.description-container h3 {
+    padding-top: 10px;
+}
+
+.description-container p {
+    padding-top: 40px;
+}
+
+.form-field {
+    width: 100%;
 }

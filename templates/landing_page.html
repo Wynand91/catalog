@@ -4,14 +4,30 @@
 
     <div class="container">
 
+        <div class="dropdown">
+            <button class="dropbtn">Sort by Category</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('category_view', category_name='acoustic') }}">Acoustic</a>
+                <a href="{{ url_for('category_view', category_name='classic') }}">Classic</a>
+                <a href="{{ url_for('category_view', category_name='telecaster') }}">Telecaster</a>
+                <a href="{{ url_for('category_view', category_name='stratocaster') }}">Stratocaster</a>
+                <a href="{{ url_for('category_view', category_name='lespaul') }}">Les paul</a>
+                <a href="{{ url_for('category_view', category_name='flying') }}">Flying V</a>
+                <a href="{{ url_for('category_view', category_name='hollowbody') }}">Hollow body</a>
+                <a href="{{ url_for('category_view', category_name='bass') }}">Bass guitars</a>
+            </div>
+        </div>
+
         <h1>Guitar World</h1>
-        <button class="add-item-button"><a href="#">Add Item</a></button>
+        <button class="add-item-button"><a href="{{ url_for('add_item') }}">Add Item</a></button>
 
         <div class="item-list">
             {% for i in items %}
             <div>
-                <a href="#">
+                <a href="{{ url_for('item_detail', pk=i.id) }}">
                     <p class="item-name">{{i.item_name}} ({{i.category.name}})</p>
+                    <button><a href="{{ url_for('edit_item', pk=i.id) }}">Edit</a></button>
+                    <button><a href="{{ url_for('delete_item', pk=i.id) }}">Delete</a></button>
                 </a>
             </div>
             {% endfor %}
