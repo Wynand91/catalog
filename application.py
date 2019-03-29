@@ -1,5 +1,8 @@
+import random, string
+
 from flask import Flask, render_template
 from flask import request
+from flask import jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
@@ -24,12 +27,12 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
+# CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 @auth.verify_password
 def verify_password(username_or_token, password):
-    #Try to see if it's a token first
+    # Check first if it is a token
     user_id = User.verify_auth_token(username_or_token)
     if user_id:
         user = session.query(User).filter_by(id=user_id).one()
@@ -40,61 +43,71 @@ def verify_password(username_or_token, password):
     g.user = user
     return True
 
+@app.route('/token')
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({'token': token.decode('ascii')})
+
 
 @app.route('/oauth/<provider>', methods=['POST'])
 def login(provider):
-    auth_code = request.json.get('auth_code')
-    if provider == 'google':
-        try:
-            # Upgrade the authorization code into a credentials object
-            oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-            oauth_flow.redirect_uri = 'postmessage'
-            credentials = oauth_flow.step2_exchange(auth_code)
-        except FlowExchangeError:
-            response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
 
-        # Check that the access token is valid.
-        access_token = credentials.access_token
-        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
-        h = httplib2.Http()
-        result = json.loads(h.request(url, 'GET')[1])
-        # If there was an error in the access token info, abort.
-        if result.get('error') is not None:
-            response = make_response(json.dumps(result.get('error')), 500)
-            response.headers['Content-Type'] = 'application/json'
+    # auth_code = request.json.get('auth_code')
+    # ding hierbo werk nie, toe ry ek maar die request data hier onder?
+    print(request.data)
 
-        # Once access tokens successfully received from google, Find User or make a new one
-        # and access user information from google
+    # if provider == 'google':
+    #     try:
+    #         # Upgrade the authorization code into a credentials object
+    #         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+    #         oauth_flow.redirect_uri = 'postmessage'
+    #         credentials = oauth_flow.step2_exchange(auth_code)
+    #     except FlowExchangeError:
+    #         response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+    #         response.headers['Content-Type'] = 'application/json'
+    #         return response
+    #
+    #     # Check that the access token is valid.
+    #     access_token = credentials.access_token
+    #     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    #     h = httplib2.Http()
+    #     result = json.loads(h.request(url, 'GET')[1])
+    #     # If there was an error in the access token info, abort.
+    #     if result.get('error') is not None:
+    #         response = make_response(json.dumps(result.get('error')), 500)
+    #         response.headers['Content-Type'] = 'application/json'
+    #
+    #     # Once access tokens successfully received from google, Find User or make a new one
+    #     # and access user information from google
+    #
+    #     # Get user info
+    #     h = httplib2.Http()
+    #     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    #     params = {'access_token': credentials.access_token, 'alt': 'json'}
+    #     answer = requests.get(userinfo_url, params=params)
+    #
+    #     data = answer.json()
+    #
+    #     name = data['name']
+    #     # email = data['email']
+    #
+    #     # see if user exists retrieve User and save to user variable, if it doesn't make a new one
+    #     user = session.query(User).filter_by(email=email).first()
+    #     if not user:
+    #         user = User(username=name)
+    #         session.add(user)
+    #         session.commit()
+    #
+    #     # Make token with generate_auth_token method found in models
+    #     token = user.generate_auth_token(600)
+    #
+    #     # Send back token to the client
+    #     return jsonify({'token': token.decode('ascii')})
+    #
+    # else:
+    #     return 'Unrecognised Provider'
 
-        # Get user info
-        h = httplib2.Http()
-        userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-        params = {'access_token': credentials.access_token, 'alt': 'json'}
-        answer = requests.get(userinfo_url, params=params)
-
-        data = answer.json()
-
-        name = data['name']
-        # picture = data['picture']
-        # email = data['email']
-
-        # see if user exists retrieve User and save to user variable, if it doesn't make a new one
-        user = session.query(User).filter_by(email=email).first()
-        if not user:
-            user = User(username=name)
-            session.add(user)
-            session.commit()
-
-        # Make token with generate_auth_token method found in models
-        token = user.generate_auth_token(600)
-
-        # Send back token to the client
-        return jsonify({'token': token.decode('ascii')})
-
-    else:
-        return 'Unrecognised Provider'
 
 @app.route('/')
 def homepage():
