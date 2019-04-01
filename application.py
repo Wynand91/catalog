@@ -56,9 +56,7 @@ def get_auth_token():
 
 @app.route('/oauth/<provider>', methods=['POST'])
 def login(provider):
-
-    # auth_code = request.json.get('auth_code')
-    # ding hierbo werk nie, toe ry ek maar die request data hier onder?
+    
     auth_code = request.data
 
     if provider == 'google':
