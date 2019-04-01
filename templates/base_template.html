@@ -22,16 +22,29 @@
     <nav class="navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand" href="{{ url_for('homepage') }}">Guitar World</a>
         <div class="login-logout">
-                <div class="collapse navbar-collapse" id="logout">
-                    <button  class="g-signin2" id="signinButton">Sign in with Google</button>
-                </div>
+                {% if not logged_in %}
                 <div class="collapse navbar-collapse" id="login">
-                    <button>Logout</button>
+                    <button  class="g-signin2"
+                             data-scope="openid email"
+                             data-clientid="905127964556-l5sicngk8au2kh2s6gnbb9isopvnf6j8.apps.googleusercontent.com"
+                             data-redirecturi="postmessage"
+                             data-accesstype="offline"
+                             data-cookiepolicy="single_host_origin"
+                             data-callback="signInCallback"
+                             data-approvalprompt="force"
+                             id="signinButton">
+                    </button>
                 </div>
+                {% else %}
+                <div class="collapse navbar-collapse" id="logout">
+                    <button id="signoutButton"><a href="{{ url_for('logout') }}" onclick="signOut()">Logout</a></button>
+                </div>
+                {% endif %}
 
         </div>
     </nav>
-    <h1 id="result"></h1>
+
+    <div id="result"></div>
 
     {% block body %}{% endblock %}
 
@@ -45,11 +58,9 @@
   });
 </script>
 <script>
-function signInCallback(json) {
-  authResult = json;
+
+function signInCallback(authResult) {
   if (authResult['code']) {
-    $('#signinButton').attr('style', 'display: none');
-    $('#result').html('One-Time Auth Code:</br>'+ authResult['code'] + '')
     $.ajax({
       type: 'POST',
       url: '/oauth/google',
@@ -57,18 +68,29 @@ function signInCallback(json) {
       data: authResult['code'],
       contentType: 'application/octet-stream; charset=utf-8',
       success: function(result) {
+        $('#signoutButton').css('display', 'block');
         // Handle or verify the server response if necessary.
         if (result) {
-          $('#result').html('Login Successful!</br>'+ result + '')
+            window.location.href = "{{ url_for('homepage') }}"
+            console.log('Login Successful!</br>'+ result + '')
         } else if (authResult['error']) {
-          console.log('There was an error: ' + authResult['error']);
+            console.log('There was an error: ' + authResult['error']);
         } else {
-          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+            console.log('Failed to make a server-side call. Check your configuration and console.');
         }
       }
     });
   }
 }
+</script>
+
+<script>
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
+    });
+  }
 </script>
 
 </body>

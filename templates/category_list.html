@@ -7,6 +7,7 @@
         <div class="dropdown">
             <button class="dropbtn">Sort by Category</button>
             <div class="dropdown-content">
+                <a href="{{ url_for('homepage') }}" style="border-bottom: 1px solid black">All</a>
                 <a href="{{ url_for('category_view', category_name='acoustic') }}">Acoustic</a>
                 <a href="{{ url_for('category_view', category_name='classic') }}">Classic</a>
                 <a href="{{ url_for('category_view', category_name='telecaster') }}">Telecaster</a>
