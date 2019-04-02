@@ -7,13 +7,7 @@ Authenticated users can add new items as well as edit/delete their own items.
 
     Python 3.5+
     
-## Requirements:
-
-   1. cd to project folder. 
-   2. Activate virtual environment if necessary.
-   3. Run `pip install -r requirements.txt`
-    
-## Installation:
+## Installation of Virtual Machine(VM):
 
 Using vagrant/virtualbox (Recommended):
 
@@ -27,6 +21,11 @@ Using vagrant/virtualbox (Recommended):
    Move the 'catalog' project folder into FSND-Virtual-Machine/vagrant. Install all requirements and run 'application.py' from here. Visit
    http://localhost:8000 locally to view app.
     
+## Requirements:
+
+   1. cd to project folder. 
+   2. Activate virtual environment if necessary.
+   3. Run `pip install -r requirements.txt`    
 
 ## How to run:
 
