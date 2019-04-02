@@ -19,15 +19,18 @@ from models import Base, User, Item
 auth = HTTPBasicAuth()
 
 app = Flask(__name__)
-app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                         for x in range(32))
 
-engine = create_engine('sqlite:///catalog.db' + '?check_same_thread=False', poolclass=SingletonThreadPool)
+engine = create_engine('sqlite:///catalog.db' + '?check_same_thread=False',
+                       poolclass=SingletonThreadPool)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(open('client_secret.json', 'r')
+                       .read())['web']['client_id']
 
 
 @app.route('/oauth/<provider>', methods=['POST'])
@@ -37,17 +40,21 @@ def login(provider):
     if provider == 'google':
         try:
             # Upgrade the authorization code into a credentials object
-            oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+            oauth_flow = flow_from_clientsecrets(
+                'client_secret.json', scope=''
+            )
             oauth_flow.redirect_uri = 'postmessage'
             credentials = oauth_flow.step2_exchange(auth_code)
         except FlowExchangeError:
-            response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+            response = make_response(
+                json.dumps('Failed to upgrade the authorization code.'), 401)
             response.headers['Content-Type'] = 'application/json'
             return response
 
         # Check that the access token is valid.
         access_token = credentials.access_token
-        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+               % access_token)
         h = httplib2.Http()
         result = json.loads((h.request(url, 'GET')[1]).decode())
         # If there was an error in the access token info, abort.
@@ -60,7 +67,9 @@ def login(provider):
         user_id = credentials.id_token['sub']
         if result['user_id'] != user_id:
             response = make_response(
-                json.dumps("Token's user ID doesn't match given user ID."), 401)
+                json.dumps(
+                    "Token's user ID doesn't match given user ID."
+                ), 401)
             response.headers['Content-Type'] = 'application/json'
             return response
 
@@ -85,7 +94,8 @@ def login(provider):
         login_session['credentials'] = credentials.token_uri
         login_session['user_id'] = user_id
 
-        # Once access tokens successfully received from google, access user information from google
+        # Once access tokens successfully received from google,
+        # access user information from google
 
         # Get user info
         h = httplib2.Http()
@@ -98,10 +108,13 @@ def login(provider):
         login_session['username'] = data['name']
         login_session['email'] = data['email']
 
-        # see if user exists, retrieve User and save to user variable, if it doesn't make a new one
-        user = session.query(User).filter_by(email=login_session['email']).first()
+        # see if user exists, retrieve User and save to user variable,
+        # if it doesn't make a new one
+        user = session.query(User).filter_by(
+            email=login_session['email']).first()
         if not user:
-            user = User(username=login_session['username'], email=login_session['email'])
+            user = User(username=login_session['username'],
+                        email=login_session['email'])
             session.add(user)
             session.commit()
 
@@ -123,7 +136,8 @@ def logout():
     except KeyError:
         return redirect(url_for('homepage'))
     if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     del login_session['credentials']
@@ -142,7 +156,8 @@ def homepage():
     logged_in = False
     if 'email' in login_session:
         logged_in = True
-    return render_template('landing_page.html', items=items, logged_in=logged_in, user=user)
+    return render_template('landing_page.html', items=items,
+                           logged_in=logged_in, user=user)
 
 
 @app.route('/category/<category_name>/')
@@ -153,8 +168,10 @@ def category_view(category_name):
         logged_in = True
         user = login_session['username']
 
-    items = session.query(Item).filter(Item.category.endswith(category_name)).all()
-    return render_template('category_list.html', items=items, logged_in=logged_in, user=user)
+    items = session.query(Item).filter(
+        Item.category.endswith(category_name)).all()
+    return render_template(
+        'category_list.html', items=items, logged_in=logged_in, user=user)
 
 
 @app.route('/detail/<int:pk>/')
@@ -166,7 +183,8 @@ def item_detail(pk):
         user = login_session['username']
 
     item = session.query(Item).get(pk)
-    return render_template('item_detail.html', item=item, logged_in=logged_in, user=user)
+    return render_template('item_detail.html', item=item,
+                           logged_in=logged_in, user=user)
 
 
 @app.route('/add/', methods=['GET', 'POST'])
@@ -183,7 +201,8 @@ def add_item():
         item_name = request.form.get('name')
         description = request.form.get('description')
         category = request.form.get('category')
-        user_id = (session.query(User).filter_by(email=login_session['email']).one())
+        user_id = (session.query(User).filter_by(
+            email=login_session['email']).one())
         new_item = Item(item_name=item_name, description=description,
                         category=category, user=user_id)
         session.add(new_item)
@@ -219,7 +238,8 @@ def edit_item(pk):
         # redirect to homepage
         return redirect(url_for('homepage'))
     else:
-        return render_template('edit_item.html', item=item, logged_in=logged_in)
+        return render_template('edit_item.html', item=item,
+                               logged_in=logged_in)
 
 
 @app.route('/delete/<int:pk>/', methods=['GET', 'POST'])
@@ -240,7 +260,8 @@ def delete_item(pk):
         # redirect to homepage
         return redirect(url_for('homepage'))
     else:
-        return render_template('delete_item.html', item=item, logged_in=logged_in)
+        return render_template('delete_item.html', item=item,
+                               logged_in=logged_in)
 
 
 @app.route('/catalog/items/JSON')
