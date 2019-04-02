@@ -196,7 +196,7 @@ def add_item():
         flash('Login Required for that action.')
         return redirect(url_for('homepage'))
 
-    # if request object contains form, handle new item logic, else render form
+    # if request post, handle new item logic, else render form
     if request.form:
         item_name = request.form.get('name')
         description = request.form.get('description')
