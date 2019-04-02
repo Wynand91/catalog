@@ -1,5 +1,22 @@
 .navbar-brand {
     width: 90%;
+    font-size: 25px;
+}
+
+.navbar-json {
+    font-size: 25px;
+    text-align: center;
+    height: 40px;
+    width: 10%;
+    background-color: #3e8e41;
+    color: white;
+    margin-right: 10px;
+}
+
+#logout {
+    font-size: 24px;
+    text-align: center;
+    color: white;
 }
 
 .container {
@@ -8,11 +25,12 @@
 }
 
 .dropbtn {
-  background-color: #4CAF50;
+  background-color: #3e8e41;
   color: white;
   padding: 16px;
   font-size: 16px;
   border: none;
+  border-radius: 10px 10px 0 0;
 }
 
 .dropdown {
@@ -47,9 +65,25 @@
     margin-right: 50px;
 }
 
+.headline {
+    font-size: 70px;
+    margin-left: 50px;
+}
+
 .add-item-button {
+    background-color: #3e8e41;
+    border-radius: 5px;
     margin-top: 50px;
     margin-left: 50px;
+}
+
+.add-item-button a {
+    color: white;
+}
+
+.add-item-button a:hover {
+    color: white;
+    text-decoration: none;
 }
 
 .item-list {
@@ -83,4 +117,26 @@
 
 .form-field {
     width: 100%;
+}
+
+.item-box {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid grey;
+}
+
+.no-items {
+    margin-left: 50px;
+    margin-top: 100px;
+}
+
+.flashes {
+    color: white;
+    background: #3e8e41;
+    font-size: 30px;
+    padding: 30px;
+    width: 450px;
+    margin: 0 auto;
+    border-radius: 10px;
+    list-style-type: none;
 }

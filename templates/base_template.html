@@ -21,6 +21,7 @@
 
     <nav class="navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand" href="{{ url_for('homepage') }}">Guitar World</a>
+        <a class="navbar-json" href="{{ url_for('item_catalog_json') }}">JSON</a>
         <div class="login-logout">
                 {% if not logged_in %}
                 <div class="collapse navbar-collapse" id="login">
@@ -44,7 +45,15 @@
         </div>
     </nav>
 
-    <div id="result"></div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 
     {% block body %}{% endblock %}
 

@@ -1,62 +1,37 @@
-import random, string
+import json
+import random
+import string
 
-
-from flask import redirect, Flask, render_template
-from flask import request, url_for
-from flask import jsonify
+import httplib2
+import requests
+from flask import redirect, flash, Flask, render_template, make_response
+from flask import request, url_for, jsonify
 from flask import session as login_session
+from flask_httpauth import HTTPBasicAuth
+from oauth2client.client import FlowExchangeError
+from oauth2client.client import flow_from_clientsecrets
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
 
-from models import Base, User, Item, secret_key
+from models import Base, User, Item
 
-from flask_httpauth import HTTPBasicAuth
-import json
-
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-from flask import make_response
-import requests
 auth = HTTPBasicAuth()
 
 app = Flask(__name__)
-app.secret_key = secret_key
+app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 
-engine = create_engine('sqlite:///catalog.db'+'?check_same_thread=False', poolclass=SingletonThreadPool)
+engine = create_engine('sqlite:///catalog.db' + '?check_same_thread=False', poolclass=SingletonThreadPool)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-
 CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
-
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # Check first if it is a token
-    user_id = User.verify_auth_token(username_or_token)
-    if user_id:
-        user = session.query(User).filter_by(id=user_id).one()
-    else:
-        user = session.query(User).filter_by(username=username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
-
-@app.route('/token')
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii')})
 
 
 @app.route('/oauth/<provider>', methods=['POST'])
 def login(provider):
-    
     auth_code = request.data
 
     if provider == 'google':
@@ -110,8 +85,7 @@ def login(provider):
         login_session['credentials'] = credentials.token_uri
         login_session['user_id'] = user_id
 
-        # Once access tokens successfully received from google, Find User or make a new one
-        # and access user information from google
+        # Once access tokens successfully received from google, access user information from google
 
         # Get user info
         h = httplib2.Http()
@@ -124,18 +98,13 @@ def login(provider):
         login_session['username'] = data['name']
         login_session['email'] = data['email']
 
-        # see if user exists retrieve User and save to user variable, if it doesn't make a new one
+        # see if user exists, retrieve User and save to user variable, if it doesn't make a new one
         user = session.query(User).filter_by(email=login_session['email']).first()
         if not user:
             user = User(username=login_session['username'], email=login_session['email'])
             session.add(user)
             session.commit()
 
-        # Make token with generate_auth_token method found in models
-        token = user.generate_auth_token(600)
-
-        # Send back token to the client
-        # return jsonify({'token': token.decode('ascii')})
         output = '<h2>Welcome %s</h2>' % login_session['username']
         return output
 
@@ -145,7 +114,10 @@ def login(provider):
 
 @app.route('/logout')
 def logout():
-    """App route function to disconnect from Google login."""
+    """
+    User is logged out by signOut() function in script.
+    This method clears the login_session.
+    """
     try:
         access_token = login_session['credentials']
     except KeyError:
@@ -164,30 +136,37 @@ def logout():
 @app.route('/')
 def homepage():
     items = session.query(Item).all()
+    user = None
+    if 'username' in login_session:
+        user = login_session['username']
     logged_in = False
     if 'email' in login_session:
         logged_in = True
-    return render_template('landing_page.html', items=items, logged_in=logged_in)
+    return render_template('landing_page.html', items=items, logged_in=logged_in, user=user)
 
 
 @app.route('/category/<category_name>/')
 def category_view(category_name):
     logged_in = False
+    user = None
     if 'email' in login_session:
         logged_in = True
+        user = login_session['username']
 
     items = session.query(Item).filter(Item.category.endswith(category_name)).all()
-    return render_template('category_list.html', items=items, logged_in=logged_in)
+    return render_template('category_list.html', items=items, logged_in=logged_in, user=user)
 
 
 @app.route('/detail/<int:pk>/')
 def item_detail(pk):
     logged_in = False
+    user = None
     if 'email' in login_session:
         logged_in = True
+        user = login_session['username']
 
     item = session.query(Item).get(pk)
-    return render_template('item_detail.html', item=item, logged_in=logged_in)
+    return render_template('item_detail.html', item=item, logged_in=logged_in, user=user)
 
 
 @app.route('/add/', methods=['GET', 'POST'])
@@ -195,6 +174,9 @@ def add_item():
     logged_in = False
     if 'email' in login_session:
         logged_in = True
+    else:
+        flash('Login Required for that action.')
+        return redirect(url_for('homepage'))
 
     # if request object contains form, handle new item logic, else render form
     if request.form:
@@ -207,9 +189,8 @@ def add_item():
         session.add(new_item)
         session.commit()
 
-        # get new list of items and render landing page
-        items = session.query(Item).all()
-        return render_template('landing_page.html', items=items, logged_in=logged_in)
+        # redirect to homepage
+        return redirect(url_for('homepage'))
     else:
         return render_template('add_item.html', logged_in=logged_in)
 
@@ -219,6 +200,9 @@ def edit_item(pk):
     logged_in = False
     if 'email' in login_session:
         logged_in = True
+    else:
+        flash('Login Required for that action.')
+        return redirect(url_for('homepage'))
 
     # if request object contains form, edit item, else render form
     item = session.query(Item).get(pk)
@@ -232,9 +216,8 @@ def edit_item(pk):
         item.category = new_category
         session.commit()
 
-        # get new list of items and render landing page
-        items = session.query(Item).all()
-        return render_template('landing_page.html', items=items, logged_in=logged_in)
+        # redirect to homepage
+        return redirect(url_for('homepage'))
     else:
         return render_template('edit_item.html', item=item, logged_in=logged_in)
 
@@ -244,6 +227,9 @@ def delete_item(pk):
     logged_in = False
     if 'email' in login_session:
         logged_in = True
+    else:
+        flash('Login Required for that action.')
+        return redirect(url_for('homepage'))
 
     # if request object contains form, delete item, else render form
     item = session.query(Item).get(pk)
@@ -251,11 +237,22 @@ def delete_item(pk):
         session.delete(item)
         session.commit()
 
-        # get new list of items and render landing page
-        items = session.query(Item).all()
-        return render_template('landing_page.html', items=items, logged_in=logged_in)
+        # redirect to homepage
+        return redirect(url_for('homepage'))
     else:
         return render_template('delete_item.html', item=item, logged_in=logged_in)
+
+
+@app.route('/catalog/items/JSON')
+def item_catalog_json():
+    items = session.query(Item).all()
+    logged_in = False
+    if 'email' not in login_session:
+        # redirect to homepage
+        flash('Login Required for that action.')
+        return redirect(url_for('homepage'))
+
+    return jsonify(catalog_items=[i.serialize for i in items])
 
 
 if __name__ == '__main__':

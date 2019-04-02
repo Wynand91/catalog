@@ -19,20 +19,26 @@
             </div>
         </div>
 
-        <h1>Guitar World</h1>
+        <h1 class="headline">Guitar World</h1>
         <button class="add-item-button"><a href="{{ url_for('add_item') }}">Add Item</a></button>
 
-        <div class="item-list">
-            {% for i in items %}
-            <div>
-                <a href="{{ url_for('item_detail', pk=i.id) }}">
-                    <p class="item-name">{{i.item_name}} ({{i.category.name}})</p>
-                    <button><a href="{{ url_for('edit_item', pk=i.id) }}">Edit</a></button>
-                    <button><a href="{{ url_for('delete_item', pk=i.id) }}">Delete</a></button>
-                </a>
+        {% if items %}
+            <div class="item-list">
+                {% for i in items %}
+                <div class="item-box">
+                    <a href="{{ url_for('item_detail', pk=i.id) }}">
+                        <p class="item-name">{{i.item_name}} ({{i.category.name}})</p>
+                        {% if user == i.user.username%}
+                            <button><a href="{{ url_for('edit_item', pk=i.id) }}">Edit</a></button>
+                            <button><a href="{{ url_for('delete_item', pk=i.id) }}">Delete</a></button>
+                        {% endif %}
+                    </a>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
+        {% else %}
+            <h1 class="no-items">No guitars to show yet.</h1>
+        {% endif  %}
     </div>
 
 {% endblock %}

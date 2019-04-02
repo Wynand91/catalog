@@ -7,8 +7,10 @@
             <h1>{{item.item_name}}</h1>
             <h3>Category: {{item.category.name}}</h3>
             <p>{{item.description}}</p>
-            <button><a href="{{ url_for('edit_item', pk=item.id) }}">Edit</a></button>
-            <button><a href="{{ url_for('delete_item', pk=item.id) }}">Delete</a></button>
+            {% if user == item.user.username%}
+                <button><a href="{{ url_for('edit_item', pk=item.id) }}">Edit</a></button>
+                <button><a href="{{ url_for('delete_item', pk=item.id) }}">Delete</a></button>
+            {% endif %}
         </div>
     </div>
 
