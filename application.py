@@ -39,7 +39,8 @@ def login(provider):
 
     if provider == 'google':
         try:
-            # Upgrade the authorization code into a credentials object
+            # Upgrade the 1-time-auth code into a credentials object
+            # credentials object contains an access token
             oauth_flow = flow_from_clientsecrets(
                 'client_secret.json', scope=''
             )
@@ -94,10 +95,8 @@ def login(provider):
         login_session['credentials'] = credentials.token_uri
         login_session['user_id'] = user_id
 
-        # Once access tokens successfully received from google,
+        # Once access tokens successfully validated,
         # access user information from google
-
-        # Get user info
         h = httplib2.Http()
         userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
         params = {'access_token': credentials.access_token, 'alt': 'json'}
@@ -165,6 +164,7 @@ def homepage():
 def category_view(category_name):
     logged_in = False
     user = None
+    # check if user is logged in
     if 'email' in login_session:
         logged_in = True
         user = login_session['username']
@@ -179,6 +179,7 @@ def category_view(category_name):
 def item_detail(pk):
     logged_in = False
     user = None
+    # check if user is logged in
     if 'email' in login_session:
         logged_in = True
         user = login_session['username']
@@ -191,6 +192,7 @@ def item_detail(pk):
 @app.route('/add/', methods=['GET', 'POST'])
 def add_item():
     logged_in = False
+    # check if user is logged in
     if 'email' in login_session:
         logged_in = True
     else:
@@ -218,6 +220,7 @@ def add_item():
 @app.route('/edit/<int:pk>/', methods=['GET', 'POST'])
 def edit_item(pk):
     logged_in = False
+    # check if user is logged in
     if 'email' in login_session:
         logged_in = True
     else:
@@ -246,6 +249,7 @@ def edit_item(pk):
 @app.route('/delete/<int:pk>/', methods=['GET', 'POST'])
 def delete_item(pk):
     logged_in = False
+    # check if user is logged in
     if 'email' in login_session:
         logged_in = True
     else:
@@ -269,6 +273,7 @@ def delete_item(pk):
 def item_catalog_json():
     items = session.query(Item).all()
     logged_in = False
+    # check if user is logged in
     if 'email' not in login_session:
         # redirect to homepage
         flash('Login Required for that action.')
