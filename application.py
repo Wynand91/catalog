@@ -128,7 +128,7 @@ def login(provider):
 @app.route('/logout')
 def logout():
     """
-    User is logged out by signOut() function in script.
+    User is logged out by signOut() function in script on base_template.html.
     This method clears the login_session.
     """
     try:
@@ -140,6 +140,7 @@ def logout():
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    # delete all data from login_session when user signs out
     del login_session['credentials']
     del login_session['user_id']
     del login_session['username']
@@ -193,7 +194,7 @@ def add_item():
     if 'email' in login_session:
         logged_in = True
     else:
-        flash('Login Required for that action.')
+        flash('Login Required for that action!')
         return redirect(url_for('homepage'))
 
     # if request post, handle new item logic, else render form
@@ -220,7 +221,7 @@ def edit_item(pk):
     if 'email' in login_session:
         logged_in = True
     else:
-        flash('Login Required for that action.')
+        flash('Login Required for that action!')
         return redirect(url_for('homepage'))
 
     # if request object contains form, edit item, else render form
@@ -248,7 +249,7 @@ def delete_item(pk):
     if 'email' in login_session:
         logged_in = True
     else:
-        flash('Login Required for that action.')
+        flash('Login Required for that action!')
         return redirect(url_for('homepage'))
 
     # if request object contains form, delete item, else render form

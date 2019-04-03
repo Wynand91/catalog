@@ -131,6 +131,10 @@
 }
 
 .flashes {
+    position: absolute;
+    left: 30%;
+    opacity: 0.8;
+    z-index: 1;
     color: white;
     background: #3e8e41;
     font-size: 30px;
@@ -139,4 +143,8 @@
     margin: 0 auto;
     border-radius: 10px;
     list-style-type: none;
+}
+
+.home-btn {
+    margin-left: 50px;
 }

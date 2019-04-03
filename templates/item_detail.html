@@ -3,13 +3,16 @@
 {% block body %}
 
     <div class="container">
+        <button><a href="{{ url_for('homepage')}}">Home</a></button>
         <div class="description-container">
             <h1>{{item.item_name}}</h1>
             <h3>Category: {{item.category.name}}</h3>
             <p>{{item.description}}</p>
             {% if user == item.user.username%}
-                <button><a href="{{ url_for('edit_item', pk=item.id) }}">Edit</a></button>
-                <button><a href="{{ url_for('delete_item', pk=item.id) }}">Delete</a></button>
+                <div class="detail-actions">
+                    <button><a href="{{ url_for('edit_item', pk=item.id) }}">Edit</a></button>
+                    <button><a href="{{ url_for('delete_item', pk=item.id) }}">Delete</a></button>
+                </div>
             {% endif %}
         </div>
     </div>

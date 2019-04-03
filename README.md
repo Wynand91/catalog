@@ -3,6 +3,8 @@
 The application provides a list of items (if there are any) within a variety of categories. User authentication is handled by OAuth. 
 Authenticated users can add new items as well as edit/delete their own items.  
 
+##### Please note! Edit and Delete buttons are not visible for items belonging to another user, or for users that are not authenticated.
+
 ## Dependencies:
 
     Python 3.5+
