@@ -35,7 +35,13 @@ Using vagrant/virtualbox (Recommended):
    2. In terminal, cd to directory containing the `application.py` script
    3. With VM running - run `python application.py`
    4. Visit http://localhost:8000 locally to view app.
+   
+## JSON API
 
+   If user is authenticated, the following JSON endpoints can be accessed:
+   
+     - JSON data of all items: http://localhost:8000/catalog/items/JSON
+     - JSON data of a specific item (where <item_id> is the id of requested item): http://localhost:8000/catalog/item/<item_id>/JSON
 ## Author
 
  - Wynand theron

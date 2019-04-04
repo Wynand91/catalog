@@ -4,12 +4,17 @@
 
     <div class="container">
         <div class="add-item">
+            {% if user == item.user.username%}
             <h1>Are you sure you want to delete this item?</h1>
             <form method="POST" action=".">
                 <input type="text" name="dummydata" value="xxxxxxx" style="display:none;">
                 <input type="submit" value="Delete">
             </form>
             <button><a href="{{ url_for('homepage') }}">Cancel</a></button>
+            {% else %}
+                <h1>You are not authorised to use this page - This item belongs to a different user</h1>
+                <button><a href="{{ url_for('homepage')}}">Home</a></button>
+            {% endif %}
         </div>
     </div>
 

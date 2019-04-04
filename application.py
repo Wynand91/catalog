@@ -35,6 +35,12 @@ CLIENT_ID = json.loads(open('client_secret.json', 'r')
 
 @app.route('/oauth/<provider>', methods=['POST'])
 def login(provider):
+    """
+    Method handles user authentication with the Google Oauth API.
+    Method receives 1-time-auth token from google and trades it for a credentials object.
+    The credentials object contains the access token for the user.
+    User information is then retrieved using the access token and stored in the login_session object.
+    """
     auth_code = request.data
 
     if provider == 'google':
@@ -127,7 +133,7 @@ def login(provider):
 @app.route('/logout')
 def logout():
     """
-    User is logged out by signOut() function in script on base_template.html.
+    User is actually logged out by signOut() function in script on base_template.html.
     This method clears the login_session.
     """
     try:
@@ -149,6 +155,11 @@ def logout():
 
 @app.route('/')
 def homepage():
+    """
+    Method to render home page with list of items.
+
+    :return: renders template
+    """
     items = session.query(Item).all()
     user = None
     if 'username' in login_session:
@@ -162,6 +173,12 @@ def homepage():
 
 @app.route('/category/<category_name>/')
 def category_view(category_name):
+    """
+    Method displays items sorted by category (selected by user).
+
+    :param category_name: The category that user wants to view
+    :return: renders template
+    """
     logged_in = False
     user = None
     # check if user is logged in
@@ -177,6 +194,12 @@ def category_view(category_name):
 
 @app.route('/detail/<int:pk>/')
 def item_detail(pk):
+    """
+    Method displays detail of a specific item
+
+    :param pk: The pk(id) of the item that user selects to be viewed
+    :return: renders template
+    """
     logged_in = False
     user = None
     # check if user is logged in
@@ -191,6 +214,11 @@ def item_detail(pk):
 
 @app.route('/add/', methods=['GET', 'POST'])
 def add_item():
+    """
+    Method renders a form for user to add a new Item.
+
+    :return: renders template or redirects user to homepage if not authenticated
+    """
     logged_in = False
     # check if user is logged in
     if 'email' in login_session:
@@ -219,6 +247,12 @@ def add_item():
 
 @app.route('/edit/<int:pk>/', methods=['GET', 'POST'])
 def edit_item(pk):
+    """
+    Method renders a template for user to edit/update an existing Item if authenticated as Item owner.
+
+    :param pk: The pk(id) of the item that user wants to change
+    :return: renders template or redirects user to homepage if not authenticated
+    """
     logged_in = False
     # check if user is logged in
     if 'email' in login_session:
@@ -229,6 +263,7 @@ def edit_item(pk):
 
     # if request object contains form, edit item, else render form
     item = session.query(Item).get(pk)
+    user = login_session['username']
     if request.form:
         new_item_name = request.form.get('name')
         new_description = request.form.get('description')
@@ -243,11 +278,17 @@ def edit_item(pk):
         return redirect(url_for('homepage'))
     else:
         return render_template('edit_item.html', item=item,
-                               logged_in=logged_in)
+                               logged_in=logged_in, user=user)
 
 
 @app.route('/delete/<int:pk>/', methods=['GET', 'POST'])
 def delete_item(pk):
+    """
+    Method renders a template for user to delete an Item if authenticated as Item owner.
+
+    :param pk: The pk(id) of the item that user wants to delete
+    :return: renders template or redirects user to homepage if not authenticated
+    """
     logged_in = False
     # check if user is logged in
     if 'email' in login_session:
@@ -258,6 +299,7 @@ def delete_item(pk):
 
     # if request object contains form, delete item, else render form
     item = session.query(Item).get(pk)
+    user = login_session['username']
     if request.form:
         session.delete(item)
         session.commit()
@@ -266,11 +308,16 @@ def delete_item(pk):
         return redirect(url_for('homepage'))
     else:
         return render_template('delete_item.html', item=item,
-                               logged_in=logged_in)
+                               logged_in=logged_in, user=user)
 
 
 @app.route('/catalog/items/JSON')
 def item_catalog_json():
+    """
+    Displays a JSON endpoint for all items in db.
+
+    :return: JSON data
+    """
     items = session.query(Item).all()
     logged_in = False
     # check if user is logged in
@@ -280,6 +327,25 @@ def item_catalog_json():
         return redirect(url_for('homepage'))
 
     return jsonify(catalog_items=[i.serialize for i in items])
+
+
+@app.route('/catalog/item/<int:pk>/JSON')
+def item_json(pk):
+    """
+    Displays a JSON endpoint for a specific item.
+
+    :param pk: pk(id) of requested Item.
+    :return: JSON data
+    """
+    item = session.query(Item).filter_by(id=pk)
+    logged_in = False
+    # check if user is logged in
+    if 'email' not in login_session:
+        # redirect to homepage
+        flash('Login Required for that action.')
+        return redirect(url_for('homepage'))
+
+    return jsonify(catalog_items=[i.serialize for i in item])
 
 
 if __name__ == '__main__':
