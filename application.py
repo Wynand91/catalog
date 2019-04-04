@@ -37,9 +37,13 @@ CLIENT_ID = json.loads(open('client_secret.json', 'r')
 def login(provider):
     """
     Method handles user authentication with the Google Oauth API.
-    Method receives 1-time-auth token from google and trades it for a credentials object.
+    Method receives 1-time-auth token from google and trades it
+    for a credentials object.
+
     The credentials object contains the access token for the user.
-    User information is then retrieved using the access token and stored in the login_session object.
+
+    User information is then retrieved using the access token
+    and stored in the login_session object.
     """
     auth_code = request.data
 
@@ -133,7 +137,7 @@ def login(provider):
 @app.route('/logout')
 def logout():
     """
-    User is actually logged out by signOut() function in script on base_template.html.
+    User is actually logged out by signOut() function on base_template.html.
     This method clears the login_session.
     """
     try:
@@ -217,7 +221,7 @@ def add_item():
     """
     Method renders a form for user to add a new Item.
 
-    :return: renders template or redirects user to homepage if not authenticated
+    :return: renders template/redirects to homepage if not authenticated
     """
     logged_in = False
     # check if user is logged in
@@ -248,10 +252,11 @@ def add_item():
 @app.route('/edit/<int:pk>/', methods=['GET', 'POST'])
 def edit_item(pk):
     """
-    Method renders a template for user to edit/update an existing Item if authenticated as Item owner.
+    Method renders a template for user to edit/update an existing Item
+     if authenticated as Item owner.
 
     :param pk: The pk(id) of the item that user wants to change
-    :return: renders template or redirects user to homepage if not authenticated
+    :return: renders template/redirects to homepage if not authenticated
     """
     logged_in = False
     # check if user is logged in
@@ -284,10 +289,11 @@ def edit_item(pk):
 @app.route('/delete/<int:pk>/', methods=['GET', 'POST'])
 def delete_item(pk):
     """
-    Method renders a template for user to delete an Item if authenticated as Item owner.
+    Method renders a template for user to delete an Item
+    if authenticated as Item owner.
 
     :param pk: The pk(id) of the item that user wants to delete
-    :return: renders template or redirects user to homepage if not authenticated
+    :return: renders template/redirects to homepage if not authenticated
     """
     logged_in = False
     # check if user is logged in
